@@ -3,357 +3,597 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bausparen Lernkarten</title>
+    <title>Bausparen Premium Exam Prep Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        server: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            950: '#030712'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #2563eb;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            touch-action: manipulation;
-            overflow-x: hidden;
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
         }
-
-        header {
-            width: 100%;
-            padding: 1rem;
-            background: var(--card-bg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 2rem;
-            box-sizing: border-box;
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
         }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
-
-        button, select {
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        button:hover { background: #f1f5f9; }
-
-        .btn-primary { background: var(--primary); color: white; border: none; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-danger { background: var(--danger); color: white; border: none; }
-        .btn-danger:hover { background: #dc2626; }
-
-        .game-container {
-            position: relative;
-            width: 90vw;
-            max-width: 400px;
-            height: 350px;
+        
+        .perspective-1000 {
             perspective: 1000px;
         }
-
-        .card {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
+        .preserve-3d {
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-radius: 20px;
         }
-
-        .card.flipped { transform: rotateY(180deg); }
-
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+        .backface-hidden {
             backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            box-sizing: border-box;
-            text-align: center;
-            border-radius: 20px;
-            background: var(--card-bg);
+            -webkit-backface-visibility: hidden;
         }
-
-        .card-back {
+        .rotate-y-180 {
             transform: rotateY(180deg);
-            background: #f0f7ff;
-            color: var(--primary);
+        }
+        .flipped {
+            transform: rotateY(180deg);
         }
 
-        .category-tag {
-            position: absolute;
-            top: 15px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            font-weight: bold;
+        .swipe-right-anim {
+            transform: translateX(180%) rotate(25deg) !important;
+            opacity: 0 !important;
+            transition: transform 0.4s ease-out, opacity 0.3s ease-out !important;
         }
-
-        .phrase-text {
-            font-size: 1.1rem;
-            font-weight: 500;
-            line-height: 1.4;
+        .swipe-left-anim {
+            transform: translateX(-180%) rotate(-25deg) !important;
+            opacity: 0 !important;
+            transition: transform 0.4s ease-out, opacity 0.3s ease-out !important;
         }
-
-        .stats {
-            margin-top: 2rem;
-            display: flex;
-            gap: 20px;
-            font-weight: bold;
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.05); }
         }
-
-        .stat-item.learned { color: var(--success); }
-        .stat-item.repeat { color: var(--danger); }
-
-        .hint {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-align: center;
-            padding: 0 10px;
-        }
-
-        .swipe-right { transform: translateX(200%) rotate(30deg) !important; opacity: 0 !important; }
-        .swipe-left { transform: translateX(-200%) rotate(-30deg) !important; opacity: 0 !important; }
-
-        .empty-state {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
+        .animated-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-indigo-500 selection:text-white">
 
-<header>
-    <h1>Bausparen Prüfungsvorbereitung 🏠</h1>
-    <div class="controls">
-        <select id="categorySelect" onchange="initGame()">
-            <option value="all">Alle Kategorien</option>
-            <option value="sparplan">Sparplan & Gebühren</option>
-            <option value="zuteilung">Zuteilungsphase</option>
-            <option value="darlehen">Darlehensphase</option>
-            <option value="rechtliches">Sonderregeln & Grundbuch</option>
-        </select>
-        <button onclick="shuffleCards()">Mischen</button>
-        <button class="btn-primary" onclick="resetGame()">Neu starten</button>
-    </div>
-</header>
+    <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-house-chimney text-white text-lg animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">Bausparen & Darlehen</h1>
+                    <p class="text-xs text-slate-400 font-medium">Interaktive Vorbereitungs-Suite</p>
+                </div>
+            </div>
 
-<div class="game-container" id="cardContainer"></div>
+            <nav class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto overflow-x-auto">
+                <button onclick="switchTab('flashcards')" id="tab-flashcards" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-blue-600 text-white">
+                    <i class="fa-solid fa-clone text-xs"></i><span>Lernkarten</span>
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-square-poll-horizontal text-xs"></i><span>Quiz</span>
+                </button>
+                <button onclick="switchTab('open-questions')" id="tab-open-questions" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-brain text-xs"></i><span>Offene Fragen</span>
+                </button>
+                <button onclick="switchTab('cram-sheet')" id="tab-cram-sheet" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-book-open text-xs"></i><span>Spickzettel</span>
+                </button>
+            </nav>
+        </div>
+    </header>
 
-<div id="emptyState" class="empty-state">
-    <h3>Fertig! Sie haben alle Karten durchgesehen.</h3>
-    <p id="finalScore"></p>
-    <div class="button-group">
-        <button id="btnRepeatMistakes" class="btn-danger" onclick="repeatMistakes()" style="display: none;">Fehler wiederholen</button>
-        <button class="btn-primary" onclick="resetGame()">Alles von vorne</button>
-    </div>
-</div>
-
-<div class="stats">
-    <div class="stat-item learned">Gewusst: <span id="learnedCount">0</span></div>
-    <div class="stat-item repeat">Wiederholen: <span id="repeatCount">0</span></div>
-</div>
-
-<div class="hint">Karte anklicken zum Umdrehen. Swipen oder Pfeiltasten (←/→) nutzen:</div>
-
-<div class="controls" style="margin-top: 1rem;">
-    <button onclick="handleSwipe('left')" style="border-color: var(--danger); color: var(--danger)">← Nicht gewusst</button>
-    <button onclick="handleSwipe('right')" style="border-color: var(--success); color: var(--success)">Gewusst →</button>
-</div>
-
-<script>
-    const allCards = [
-        // Sparplan & Gebühren
-        { frage: "Wie hoch ist in der Regel die monatliche Regelsparrate?", antwort: "1/2 % der Bausparsumme (Dies ist eine Empfehlung, kein Muss).", cat: "sparplan" },
-        { frage: "Was ist eine Sonderzahlung (z.B. 4000 €)?", antwort: "Eine einmalige Einzahlung, beispielsweise eine Prämie vom Arbeitgeber.", cat: "sparplan" },
-        { frage: "Wann und warum muss die Abschlussgebühr bezahlt werden?", antwort: "Zu Beginn (sonst startet der Vertrag im Minus). Die Bank zieht das Geld für die Kontoeröffnung ab.", cat: "sparplan" },
-        { frage: "Wie hoch ist die Abschlussgebühr üblicherweise?", antwort: "1% der Bausparsumme.", cat: "sparplan" },
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
         
-        // Zuteilungsphase
-        { frage: "Nenne die 3 Bedingungen für die Zuteilung.", antwort: "1. Mindestbausparsumme (40-50%)<br>2. Mindestlaufzeit (meist 12-18 Monate)<br>3. Mindestbewertungszahl erreicht", cat: "zuteilung" },
-        { frage: "Was bestimmt die Mindestbewertungszahl?", antwort: "Einen Faktor, der misst, wie lange und in welcher Höhe der Kunde Guthaben eingezahlt hat.", cat: "zuteilung" },
-        { frage: "Wer hat bei der Zuteilung Vorrang?", antwort: "Bausparer mit einer höheren Bewertungszahl (schnellerer Erfüllung).", cat: "zuteilung" },
-        { frage: "Welche 4 Handlungsmöglichkeiten gibt es nach der Zuteilung?", antwort: "1. Weiteres Sparen<br>2. Darlehen in Anspruch nehmen<br>3. Vertrag auflösen<br>4. Stilllegen", cat: "zuteilung" },
-        { frage: "Was passiert beim 'Stilllegen' des Vertrags?", antwort: "Einzahlungen stoppen, Guthaben wächst durch schwachen Zins weiter (oft nur 0,1%), Anspruch auf das zinsgünstige Darlehen bleibt bestehen.", cat: "zuteilung" },
+        <section id="view-flashcards" class="tab-view block space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kategorie:</label>
+                    <select id="fcCategorySelect" onchange="initFlashcards()" class="bg-slate-950 border border-slate-800 text-sm rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="all">Alle Themen</option>
+                        <option value="sparplan">1. Sparplan & Gebühren</option>
+                        <option value="zuteilung">2. Zuteilungsphase</option>
+                        <option value="darlehen">3. Darlehensphase</option>
+                        <option value="rechtliches">4. Sonderrechte & Grundbuch</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="shuffleFlashcards()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded-lg transition"><i class="fa-solid fa-shuffle mr-1.5"></i>Mischen</button>
+                    <button onclick="resetFlashcards()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded-lg transition"><i class="fa-solid fa-rotate-left mr-1.5"></i>Reset</button>
+                </div>
+            </div>
 
-        // Darlehensphase
-        { frage: "Wie berechnet sich die bereitzustellende Kreditsumme (Darlehen)?", antwort: "(Bausparsumme - Bausparguthaben) + Zinsen.", cat: "darlehen" },
-        { frage: "Welcher Zinssatz gilt in der Darlehensphase?", antwort: "Ein fester Sollzins, der von Anfang an im ursprünglichen Bauspartarif vereinbart wurde.", cat: "darlehen" },
-        { frage: "Für welchen Verwendungszweck darf das Darlehen genutzt werden?", antwort: "Nur für wohnwirtschaftliche Zwecke! (Dies gilt auch für Angehörige).", cat: "darlehen" },
+            <div class="flex flex-col items-center justify-center min-h-[400px]">
+                <div class="perspective-1000 w-full max-w-md h-72 relative" id="fcContainer">
+                    </div>
 
-        // Sonderregeln & Grundbuch
-        { frage: "Was besagt das Angehörigenprivileg?", antwort: "Es gilt für direkte Abkömmlinge (Kinder, Enkel). Ein fertiger (oder unterreifer) Vertrag kann übertragen werden.", cat: "rechtliches" },
-        { frage: "Welche Regelung gilt für Sondertilgungen (Kreditrückzahlung)?", antwort: "Eine vorzeitige Rückzahlung des Kredits ist jederzeit und ohne Kosten möglich.", cat: "rechtliches" },
-        { frage: "An welcher Rangstelle im Grundbuch trägt sich die Bausparkasse (BSK) standardmäßig ein?", antwort: "An 2. Stelle (hinter der finanzierenden Erstbank). Steht keine andere Bank drin, rückt sie auf Platz 1.", cat: "rechtliches" },
-        { frage: "Wo liegt die Befreiungsgrenze im Grundbuch?", antwort: "Bei 30%.", cat: "rechtliches" }
-    ];
+                <div id="fcEmptyState" class="hidden text-center space-y-4 max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800">
+                    <div class="text-emerald-400 text-4xl"><i class="fa-solid fa-circle-check"></i></div>
+                    <h3 class="text-xl font-bold">Ausgezeichnet gelernt!</h3>
+                    <p class="text-sm text-slate-400" id="fcFinalScore"></p>
+                    <div class="flex gap-3 justify-center">
+                        <button id="btnRepeatFcMistakes" onclick="repeatFcMistakes()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-sm font-medium rounded-xl transition hidden">Fehler wiederholen</button>
+                        <button onclick="resetFlashcards()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-sm font-medium rounded-xl transition">Alles von vorne</button>
+                    </div>
+                </div>
 
-    let currentQueue = [];
-    let mistakes = [];
-    let learned = 0;
-    let toRepeatCount = 0;
-    let isFlipped = false;
+                <div class="flex items-center gap-8 mt-6 text-sm font-semibold tracking-wide">
+                    <div class="text-emerald-400"><i class="fa-solid fa-check-double mr-1.5"></i>Gewusst: <span id="fcLearnedCount">0</span></div>
+                    <div class="text-rose-400"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Wiederholen: <span id="fcRepeatCount">0</span></div>
+                </div>
 
-    function initGame() {
-        const cat = document.getElementById('categorySelect').value;
-        currentQueue = cat === 'all' ? [...allCards] : allCards.filter(c => c.cat === cat);
-        mistakes = [];
-        learned = 0;
-        toRepeatCount = 0;
-        updateStats();
-        showNextCard();
-        document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('cardContainer').style.display = 'block';
-    }
+                <div class="flex gap-4 mt-6 w-full max-w-md">
+                    <button onclick="handleFcSwipe('left')" class="flex-1 py-3 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800 text-rose-400 font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-arrow-left"></i> Nicht gewusst
+                    </button>
+                    <button onclick="handleFcSwipe('right')" class="flex-1 py-3 bg-slate-900 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-800 text-emerald-400 font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                        Gewusst <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-4"><i class="fa-solid fa-keyboard mr-1"></i> Tipp: Leertaste zum Drehen, Pfeiltasten [←] [→] für die Bewertung.</p>
+            </div>
+        </section>
 
-    function repeatMistakes() {
-        if (mistakes.length === 0) return;
-        currentQueue = [...mistakes];
-        mistakes = [];
-        learned = 0;
-        toRepeatCount = 0;
-        updateStats();
-        showNextCard();
-        document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('cardContainer').style.display = 'block';
-    }
+        <section id="view-quiz" class="tab-view hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-semibold text-slate-400">
+                        <span id="quizIndexLabel">Frage 1 von 10</span>
+                        <span id="quizScoreLabel">Score: 0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                        <div id="quizProgressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
 
-    function shuffleCards() {
-        currentQueue.sort(() => Math.random() - 0.5);
-        showNextCard();
-    }
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5">
+                    <span id="quizTopicTag" class="text-[10px] bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Thema</span>
+                    <h3 id="quizQuestionText" class="text-base font-semibold mt-3 leading-relaxed">Lade Frage...</h3>
+                </div>
 
-    function resetGame() { initGame(); }
+                <div id="quizOptionsContainer" class="grid grid-cols-1 gap-3">
+                    </div>
 
-    function showNextCard() {
-        const container = document.getElementById('cardContainer');
-        container.innerHTML = '';
-        isFlipped = false;
+                <div id="quizFeedbackBox" class="hidden border rounded-xl p-4 space-y-2 animate-fadeIn">
+                    <div class="flex items-center gap-2 font-bold text-sm" id="quizFeedbackStatus"></div>
+                    <p class="text-sm text-slate-300 leading-relaxed" id="quizExplanationText"></p>
+                    <button onclick="nextQuizQuestion()" class="mt-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-1 ml-auto">
+                        Nächste Frage <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
 
-        if (currentQueue.length === 0) {
-            container.style.display = 'none';
-            const emptyState = document.getElementById('emptyState');
-            emptyState.style.display = 'block';
-            document.getElementById('finalScore').innerHTML = `<strong>Ergebnis:</strong> ${learned} gewusst, ${mistakes.length} Fehler.`;
-            const btnMistakes = document.getElementById('btnRepeatMistakes');
-            btnMistakes.style.display = mistakes.length > 0 ? 'inline-block' : 'none';
-            return;
+                <div id="quizResultState" class="hidden text-center py-6 space-y-4">
+                    <div class="text-4xl text-indigo-400"><i class="fa-solid fa-trophy"></i></div>
+                    <h3 class="text-xl font-bold">Quiz beendet!</h3>
+                    <p class="text-sm text-slate-400" id="quizFinalMeta"></p>
+                    <button onclick="resetQuiz()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 font-semibold text-sm rounded-xl transition">Erneut versuchen</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-open-questions" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="openQuestionsGrid">
+                </div>
+        </section>
+
+        <section id="view-cram-sheet" class="tab-view hidden space-y-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-lg">
+                <div class="border-b border-slate-800 pb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-file-invoice-dollar text-xl text-blue-400"></i>
+                    <h2 class="text-lg font-bold text-blue-400">Teil 1: Vorbereitung Bausparen</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide border-l-2 border-indigo-500 pl-2">1. Sparplan & Gebühren</h3>
+                        <ul class="space-y-2 text-sm text-slate-400">
+                            <li><strong class="text-slate-200">Regelsparrate:</strong> In der Regel <span class="text-indigo-400 font-semibold">1/2 % der Bausparsumme (BSP-Summe)</span> pro Monat. Es ist eine Empfehlung, kein gesetzliches Muss.</li>
+                            <li><strong class="text-slate-200">Guthabenzins:</strong> Der feste Zinssatz für das angesparte Kapital.</li>
+                            <li><strong class="text-slate-200">Sonderzahlung:</strong> Einmalige außerordentliche Einzahlung (z. B. 4000 € via Arbeitgeber-Prämie).</li>
+                            <li><strong class="text-slate-200">Abschlussgebühr:</strong> Beträgt standardmäßig <span class="text-indigo-400 font-semibold">1% der BSP-Summe</span>. Wird sofort fällig, weshalb der Vertrag im Minus startet.</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide border-l-2 border-indigo-500 pl-2">2. Die Zuteilungsphase</h3>
+                        <p class="text-xs text-slate-400">Drei zwingende Bedingungen für die Zuteilung des Vertragsziels:</p>
+                        <ul class="space-y-2 text-sm text-slate-400">
+                            <li><strong class="text-slate-200">1. Mindestguthaben:</strong> Mindestens <span class="text-amber-400 font-semibold">40-50% der Bausparsumme</span> müssen angespart sein.</li>
+                            <li><strong class="text-slate-200">2. Mindestlaufzeit:</strong> Tariflich festgelegt, meistens <span class="text-amber-400 font-semibold">12–18 Monate</span> ab Vertragsabschluss.</li>
+                            <li><strong class="text-slate-200">3. Mindestbewertungszahl:</strong> Berechnet sich aus der zeitlichen Dauer und der exakten Höhe der getätigten Einzahlungen.</li>
+                            <li><strong class="text-slate-200">Vorrangregel:</strong> Bausparer mit einer höheren Bewertungszahl werden im Zuteilungspool bevorzugt bedient.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 shadow-lg">
+                <div class="border-b border-slate-800 pb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-handshake text-xl text-emerald-400"></i>
+                    <h2 class="text-lg font-bold text-emerald-400">Teil 2: Optionen & Darlehensphase</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide border-l-2 border-emerald-500 pl-2">Optionen nach Zuteilung</h3>
+                        <table class="w-full text-xs text-left text-slate-400 border border-slate-800 rounded-lg overflow-hidden">
+                            <thead class="bg-slate-950 text-slate-300">
+                                <tr>
+                                    <th class="p-2 border-b border-slate-800">Option</th>
+                                    <th class="p-2 border-b border-slate-800">Beschreibung</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-2 font-semibold text-slate-200">Weiteres Sparen</td>
+                                    <td class="p-2">Kapital verbleibt im Vertrag und wird weiter bespart.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold text-slate-200">Darlehen nutzen</td>
+                                    <td class="p-2">Auszahlung der Gesamtsumme (Guthaben + Kredit).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold text-slate-200">Auflösen</td>
+                                    <td class="p-2">Vertrag kündigen und reines Guthaben auszahlen lassen.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold text-slate-200">Stilllegen</td>
+                                    <td class="p-2">Einzahlungen stoppen. Verzinsung läuft minimal weiter (ca. 0,1%). Darlehensanspruch bleibt gesichert.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide border-l-2 border-emerald-500 pl-2">3. Kreditphase & Grundbuch</h3>
+                        <ul class="space-y-2 text-sm text-slate-400">
+                            <li><strong class="text-slate-200">Berechnung Kreditsumme:</strong> <code class="text-xs font-mono bg-slate-950 px-1.5 py-0.5 rounded text-emerald-400">(Bausparsumme - Bausparguthaben) + Zinsen</code>.</li>
+                            <li><strong class="text-slate-200">Sollzins:</strong> Von Anfang an fest im Bauspartarif garantiert (Zinssicherheit).</li>
+                            <li><strong class="text-slate-200">Verwendungszweck:</strong> Strikt gebunden <span class="text-emerald-400 font-semibold">nur für wohnwirtschaftliche Zwecke</span> (gilt auch für direkte Angehörige via Privileg).</li>
+                            <li><strong class="text-slate-200">Vertragsübertragung:</strong> Problemlos auf Kinder oder Enkel übertragbar, selbst wenn der Vertrag noch "unterreif" ist.</li>
+                            <li><strong class="text-slate-200">Sondertilgung:</strong> Jederzeit absolut <span class="text-emerald-400 font-semibold">kostenfrei</span> möglich.</li>
+                            <li><strong class="text-slate-200">Grundbucheintrag:</strong> Die Bausparkasse (BSK) trägt sich standardmäßig an <span class="text-emerald-400 font-semibold">2. Rangstelle</span> ein (hinter der Erstbank). Die Befreiunggrenze liegt bei <span class="text-emerald-400 font-semibold">30%</span>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Comprehensive Material Database
+        const MASTER_DATA = [
+            { id: 1, cat: "sparplan", label: "Sparplan", q: "Wie hoch ist die monatliche Regelsparrate eines Bausparvertrags üblicherweise?", a: ["1/2 % der Bausparsumme", "1% der Bausparsumme", "2% der Bausparsumme"], ans: 0, exp: "Die Regelsparrate beträgt meistens 1/2 % der vereinbarten Bausparsumme. Das ist jedoch eine reine Empfehlung der BSK und kein rechtliches Muss." },
+            { id: 2, cat: "sparplan", label: "Sparplan", q: "Welche Gebühr fällt direkt zu Beginn des Bausparvertrags an und wie hoch ist sie meistens?", a: ["Eine Kontoführungsgebühr von 5%", "Eine Abschlussgebühr von 1% der Bausparsumme", "Eine Zuteilungsgebühr von 0,5%"], ans: 1, exp: "Die Abschlussgebühr beträgt in der Regel 1% der Bausparsumme. Sie sorgt dafür, dass das Konto anfangs im Minus startet." },
+            { id: 3, cat: "sparplan", label: "Sparplan", q: "Was versteht man unter einer Sonderzahlung im Bausparplan?", a: ["Eine Strafgebühr bei Zahlungsverzug", "Eine einmalige Einzahlung, z. B. eine vermögenswirksame Prämie vom Arbeitgeber", "Die Zinszahlung der Bank"], ans: 1, exp: "Sonderzahlungen sind einmalige Zahlungen des Kunden oder des Arbeitgebers (z. B. 4.000 €), die das Guthaben schneller erhöhen." },
+            { id: 4, cat: "zuteilung", label: "Zuteilungsphase", q: "Welche drei Bedingungen müssen für die Zuteilung eines Bausparvertrags erfüllt sein?", a: ["Mindestalter, ungekündigtes Arbeitsverhältnis, Schufa-Auskunft", "Mindestguthaben (40-50%), Mindestlaufzeit, Mindestbewertungszahl", "Mindestbausparsumme, Bürgschaft, notarielle Beglaubigung"], ans: 1, exp: "Für die Zuteilung müssen das Mindestguthaben (40-50% der Summe), die Mindestlaufzeit (oft 12-18 Monate) sowie die tarifliche Mindestbewertungszahl erreicht sein." },
+            { id: 5, cat: "zuteilung", label: "Zuteilungsphase", q: "Nach welchem Kriterium wird entschieden, welcher Bausparer bei begrenzten Mitteln Vorrang hat?", a: ["Nach dem Alter des Bausparers", "Nach der Höhe der Abschlussgebühr", "Nach der Höhe der Bewertungszahl"], ans: 2, exp: "Bausparer mit einer höheren Bewertungszahl haben im Zuteilungsverfahren immer Vorrang vor Bausparern mit niedrigerer Zahl." },
+            { id: 6, cat: "zuteilung", label: "Zuteilungsphase", q: "Was bedeutet es, einen zuteilungsreifen Vertrag 'stillzulegen'?", a: ["Das Guthaben verfällt dauerhaft", "Der Kunde stoppt Einzahlungen, behält aber den Anspruch auf das zinsgünstige Darlehen", "Der Vertrag wird automatisch aufgelöst"], ans: 1, exp: "Beim Stilllegen ruht der Vertrag. Es wird kein frisches Geld eingezahlt, das Guthaben wird minimal weiterverzinst (oft 0,1%) und der Darlehensanspruch bleibt voll erhalten." },
+            { id: 7, cat: "darlehen", label: "Darlehensphase", q: "Wie berechnet sich die Kreditsumme, die in der Darlehensphase bereitgestellt wird?", a: ["(Bausparsumme - Bausparguthaben) + Zinsen", "Bausparsumme + Abschlussgebühr", "Reines Bausparguthaben mal zwei"], ans: 0, exp: "Das bereitgestellte Darlehen deckt die Differenz ab: (Bausparsumme minus angespartes Bausparguthaben) zuzüglich der anfallenden Zinsen." },
+            { id: 8, cat: "darlehen", label: "Darlehensphase", q: "Welche strikte gesetzliche Vorgabe gilt für die Verwendung des Bauspardarlehens?", a: ["Es kann frei für Konsumgüter (z. B. Autos) genutzt werden", "Es darf nur für wohnwirtschaftliche Zwecke verwendet werden", "Es darf nur für gewerbliche Großprojekte genutzt werden"], ans: 1, exp: "Bauspardarlehen unterliegen einer strikten Zweckbindung: Sie dürfen ausschließlich für wohnwirtschaftliche Zwecke (Bau, Kauf, Renovierung) genutzt werden." },
+            { id: 9, cat: "rechtliches", label: "Sonderrechte", q: "Was besagt das Angehörigenprivileg bei der Vertragsübertragung?", a: ["Dass Verträge nur an Ehepartner übertragen werden dürfen", "Dass fertige oder unterreife Verträge auf direkte Abkömmlinge (Kinder, Enkel) übertragen werden können", "Dass Angehörige keine Abschlussgebühr zahlen"], ans: 1, exp: "Das Angehörigenprivileg erlaubt es, den Vertrag (selbst wenn er noch unterreif ist) auf direkte Nachkommen wie Kinder oder Enkelkinder zu übertragen." },
+            { id: 10, cat: "rechtliches", label: "Grundbuch", q: "An welcher Rangstelle im Grundbuch trägt sich die Bausparkasse (BSK) im Regelfall ein?", a: ["An erster Stelle", "An zweiter Stelle (hinter der finanzierenden Erstbank)", "Immer im Zusatzblatt außerhalb der Rangstellen"], ans: 1, exp: "Standardmäßig sichert sich die BSK an zweiter Rangstelle ab. Platz 1 bleibt für die finanzierende Erstbank reserviert. Ist dieser frei, rückt die BSK auf Platz 1." },
+            { id: 11, cat: "rechtliches", label: "Grundbuch", q: "Wo liegt die regulatorische Befreiungsgrenze im Grundbuch für Bausparkassen?", a: ["Bei 10%", "Bei 30%", "Bei 50%"], ans: 1, exp: "Die spezifische Befreiungsgrenze der Bausparkassen im Grundbuchrecht liegt laut Material bei exakt 30%." },
+            { id: 12, cat: "darlehen", label: "Darlehensphase", q: "Wie sind Sondertilgungen (vorzeitige Rückzahlungen) im Bauspardarlehen geregelt?", a: ["Nur einmal pro Jahr gegen Gebühr zulässig", "Jederzeit und absolut kostenfrei möglich", "Generell vertraglich ausgeschlossen"], ans: 1, exp: "Ein riesiger Vorteil des Bauspardarlehens ist die Flexibilität: Sondertilgungen sind jederzeit ohne Vorfälligkeitsentschädigung oder Extrakosten möglich." }
+        ];
+
+        // Global State Configuration
+        let activeTab = 'flashcards';
+        let fcQueue = [];
+        let fcMistakes = [];
+        let fcLearnedCount = 0;
+        let fcRepeatCount = 0;
+        let fcIsFlipped = false;
+
+        let quizQueue = [];
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+
+        // Tab Orchestrator
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+            
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+            activeBtn.classList.add('bg-blue-600', 'text-white');
+
+            if(tabId === 'flashcards') initFlashcards();
+            if(tabId === 'quiz') resetQuiz();
+            if(tabId === 'open-questions') initOpenQuestions();
         }
 
-        const data = currentQueue[0];
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.id = 'activeCard';
-        card.onclick = () => {
-            card.classList.toggle('flipped');
-            isFlipped = !isFlipped;
-        };
-
-        const catLabels = {
-            sparplan: "Sparplan & Gebühren",
-            zuteilung: "Zuteilungsphase",
-            darlehen: "Darlehensphase",
-            rechtliches: "Sonderregeln"
-        };
-
-        card.innerHTML = `
-            <div class="card-face card-front">
-                <span class="category-tag">${catLabels[data.cat] || data.cat}</span>
-                <div class="phrase-text">${data.frage}</div>
-            </div>
-            <div class="card-face card-back">
-                <span class="category-tag">Antwort</span>
-                <div class="phrase-text">${data.antwort}</div>
-            </div>
-        `;
-        container.appendChild(card);
-        setupTouch(card);
-    }
-
-    function handleSwipe(direction) {
-        const card = document.getElementById('activeCard');
-        if (!card) return;
-        if (direction === 'right') {
-            card.classList.add('swipe-right');
-            learned++;
-        } else {
-            card.classList.add('swipe-left');
-            mistakes.push(currentQueue[0]);
-            toRepeatCount++;
+        // ================= FLASHCARDS SYSTEM =================
+        function initFlashcards() {
+            const selectedCat = document.getElementById('fcCategorySelect').value;
+            fcQueue = selectedCat === 'all' ? [...MASTER_DATA] : MASTER_DATA.filter(item => item.cat === selectedCat);
+            fcMistakes = [];
+            fcLearnedCount = 0;
+            fcRepeatCount = 0;
+            updateFcStats();
+            renderNextFlashcard();
+            document.getElementById('fcEmptyState').classList.add('hidden');
+            document.getElementById('fcContainer').classList.remove('hidden');
         }
-        updateStats();
-        setTimeout(() => {
-            currentQueue.shift();
-            showNextCard();
-        }, 300);
-    }
 
-    function updateStats() {
-        document.getElementById('learnedCount').innerText = learned;
-        document.getElementById('repeatCount').innerText = toRepeatCount;
-    }
+        function resetFlashcards() { initFlashcards(); }
 
-    function setupTouch(el) {
-        let startX = 0; let startY = 0;
-        el.addEventListener('touchstart', e => {
-            startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-        }, {passive: true});
-        el.addEventListener('touchend', e => {
-            let diffX = e.changedTouches[0].clientX - startX;
-            let diffY = e.changedTouches[0].clientY - startY;
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-                if (diffX > 0) handleSwipe('right');
-                else handleSwipe('left');
+        function shuffleFlashcards() {
+            fcQueue.sort(() => Math.random() - 0.5);
+            renderNextFlashcard();
+        }
+
+        function repeatFcMistakes() {
+            if(fcMistakes.length === 0) return;
+            fcQueue = [...fcMistakes];
+            fcMistakes = [];
+            fcRepeatCount = 0;
+            updateFcStats();
+            renderNextFlashcard();
+            document.getElementById('fcEmptyState').classList.add('hidden');
+            document.getElementById('fcContainer').classList.remove('hidden');
+        }
+
+        function renderNextFlashcard() {
+            const container = document.getElementById('fcContainer');
+            container.innerHTML = '';
+            fcIsFlipped = false;
+
+            if (fcQueue.length === 0) {
+                container.classList.add('hidden');
+                const emptyState = document.getElementById('fcEmptyState');
+                emptyState.classList.remove('hidden');
+                document.getElementById('fcFinalScore').innerHTML = `Du hast alle Karten durchgearbeitet.<br><span class="text-emerald-400 font-bold">${fcLearnedCount} gewusst</span> und <span class="text-rose-400 font-bold">${fcMistakes.length} Fehler</span> gemacht.`;
+                
+                const btnMistakes = document.getElementById('btnRepeatFcMistakes');
+                if(fcMistakes.length > 0) {
+                    btnMistakes.classList.remove('hidden');
+                } else {
+                    btnMistakes.classList.add('hidden');
+                }
+                return;
             }
-        }, {passive: true});
-    }
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') handleSwipe('right');
-        if (e.key === 'ArrowLeft') handleSwipe('left');
-        if (e.key === ' ') {
-            const card = document.getElementById('activeCard');
-            if (card) card.click();
-            e.preventDefault();
+            const currentItem = fcQueue[0];
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card w-full h-full absolute preserve-3d cursor-pointer transition-transform duration-500';
+            cardEl.id = 'activeFcCard';
+            
+            cardEl.onclick = () => {
+                cardEl.classList.toggle('flipped');
+                fcIsFlipped = !fcIsFlipped;
+            };
+
+            cardEl.innerHTML = `
+                <div class="card-face backface-hidden w-full h-full bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-2xl">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded uppercase tracking-wider">${currentItem.label}</span>
+                        <i class="fa-solid fa-eye text-slate-600 text-xs"></i>
+                    </div>
+                    <div class="text-center text-base font-medium px-2 text-slate-100 leading-relaxed">${currentItem.q}</div>
+                    <div class="text-[11px] text-slate-500 text-center font-medium uppercase tracking-widest"><i class="fa-solid fa-rotate mr-1"></i> Klicken zum Drehen</div>
+                </div>
+                <div class="card-face backface-hidden w-full h-full bg-slate-900 border border-blue-900/50 rounded-2xl p-6 flex flex-col justify-between shadow-2xl rotate-y-180 bg-gradient-to-b from-slate-900 to-slate-950">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider">Antwort / Erläuterung</span>
+                        <i class="fa-solid fa-circle-info text-blue-500 text-xs"></i>
+                    </div>
+                    <div class="text-center text-sm font-normal text-slate-200 overflow-y-auto max-h-40 py-2 px-1 leading-relaxed border-y border-slate-800/50 my-2">
+                        <strong class="text-emerald-400 block mb-1.5 text-xs uppercase tracking-wide">Richtig: ${currentItem.a[currentItem.ans]}</strong>
+                        ${currentItem.exp}
+                    </div>
+                    <div class="text-[10px] text-slate-600 text-center uppercase tracking-wider font-semibold">Bauspar-Wissen Suite</div>
+                </div>
+            `;
+            container.appendChild(cardEl);
         }
-    });
 
-    initGame();
-</script>
+        function handleFcSwipe(direction) {
+            const card = document.getElementById('activeFcCard');
+            if (!card) return;
+
+            if (direction === 'right') {
+                card.classList.add('swipe-right-anim');
+                fcLearnedCount++;
+            } else {
+                card.classList.add('swipe-left-anim');
+                fcMistakes.push(fcQueue[0]);
+                fcRepeatCount++;
+            }
+            
+            updateFcStats();
+            setTimeout(() => {
+                fcQueue.shift();
+                renderNextFlashcard();
+            }, 350);
+        }
+
+        function updateFcStats() {
+            document.getElementById('fcLearnedCount').innerText = fcLearnedCount;
+            document.getElementById('fcRepeatCount').innerText = fcRepeatCount;
+        }
+
+        // ================= QUIZ ENGINE =================
+        function resetQuiz() {
+            quizQueue = [...MASTER_DATA].sort(() => Math.random() - 0.5).slice(0, 10); // 10 random questions
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            document.getElementById('quizResultState').classList.add('hidden');
+            document.getElementById('quizFeedbackBox').classList.add('hidden');
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if (quizCurrentIndex >= quizQueue.length) {
+                showQuizResults();
+                return;
+            }
+
+            // Progress Bar Update
+            const total = quizQueue.length;
+            const progressPercent = ((quizCurrentIndex) / total) * 100;
+            document.getElementById('quizProgressBar').style.width = `${progressPercent}%`;
+            document.getElementById('quizIndexLabel').innerText = `Frage ${quizCurrentIndex + 1} von ${total}`;
+            document.getElementById('quizScoreLabel').innerText = `Score: ${Math.round((quizScore / (quizCurrentIndex || 1)) * 100)}%`;
+
+            const currentQuestion = quizQueue[quizCurrentIndex];
+            document.getElementById('quizTopicTag').innerText = currentQuestion.label;
+            document.getElementById('quizQuestionText').innerText = currentQuestion.q;
+            document.getElementById('quizFeedbackBox').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-opt-btn w-full text-left p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 text-sm font-medium transition-all flex items-center justify-between group";
+                btn.innerHTML = `<span>${opt}</span><i class="fa-regular fa-circle text-slate-600 group-hover:text-slate-400 transition text-xs"></i>`;
+                btn.onclick = () => evaluateQuizChoice(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function evaluateQuizChoice(choiceIdx, selectedBtn) {
+            const currentQuestion = quizQueue[quizCurrentIndex];
+            const allOptionButtons = document.querySelectorAll('.quiz-opt-btn');
+            
+            // Disable further option clicks
+            allOptionButtons.forEach(btn => btn.disabled = true);
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            const feedbackStatus = document.getElementById('quizFeedbackStatus');
+            const explanationText = document.getElementById('quizExplanationText');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (choiceIdx === currentQuestion.ans) {
+                selectedBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-950/40 border border-emerald-500 text-emerald-200 text-sm font-medium flex items-center justify-between";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 text-sm";
+                feedbackBox.className = "border border-emerald-800/60 bg-emerald-950/20 rounded-xl p-4 space-y-1 animate-fadeIn";
+                feedbackStatus.className = "flex items-center gap-2 font-bold text-sm text-emerald-400";
+                feedbackStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> Richtig beantwortet!`;
+                quizScore++;
+            } else {
+                selectedBtn.className = "w-full text-left p-4 rounded-xl bg-rose-950/40 border border-rose-500 text-rose-200 text-sm font-medium flex items-center justify-between";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400 text-sm";
+                
+                // Highlight the correct answer item
+                allOptionButtons[currentQuestion.ans].className = "w-full text-left p-4 rounded-xl bg-emerald-950/20 border border-emerald-800/60 text-emerald-400 text-sm font-medium flex items-center justify-between";
+                allOptionButtons[currentQuestion.ans].querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-sm";
+
+                feedbackBox.className = "border border-rose-800/60 bg-rose-950/10 rounded-xl p-4 space-y-1 animate-fadeIn";
+                feedbackStatus.className = "flex items-center gap-2 font-bold text-sm text-rose-400";
+                feedbackStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Falsche Auswahl`;
+            }
+
+            explanationText.innerText = currentQuestion.exp;
+        }
+
+        function nextQuizQuestion() {
+            quizCurrentIndex++;
+            renderQuizQuestion();
+        }
+
+        function showQuizResults() {
+            document.getElementById('quizProgressBar').style.width = `100%`;
+            document.getElementById('quizOptionsContainer').innerHTML = '';
+            document.getElementById('quizFeedbackBox').classList.add('hidden');
+            document.getElementById('quizQuestionText').innerText = "Auswertung läuft...";
+
+            const finalMeta = document.getElementById('quizFinalMeta');
+            const percent = Math.round((quizScore / quizQueue.length) * 100);
+            
+            finalMeta.innerHTML = `Du hast <span class="text-indigo-400 font-bold">${quizScore} von ${quizQueue.length}</span> Fragen richtig beantwortet.<br><span class="text-2xl font-extrabold ${percent >= 70 ? 'text-emerald-400' : 'text-amber-400'}">${percent}% Erfolgsquote</span>`;
+            document.getElementById('quizResultState').classList.remove('hidden');
+        }
+
+        // ================= OPEN QUESTIONS SYSTEM =================
+        function initOpenQuestions() {
+            const container = document.getElementById('openQuestionsGrid');
+            container.innerHTML = '';
+
+            MASTER_DATA.forEach((item, index) => {
+                const box = document.createElement('div');
+                box.className = "bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3 flex flex-col justify-between";
+                box.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-bold bg-slate-950 border border-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase tracking-wider">${item.label}</span>
+                            <span class="text-[10px] font-mono text-slate-600">ID #${item.id}</span>
+                        </div>
+                        <h4 class="text-sm font-semibold text-slate-200 leading-relaxed">${item.q}</h4>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="document.getElementById('open-ans-${index}').classList.toggle('hidden')" class="px-3 py-1.5 bg-slate-950 border border-slate-800 hover:bg-slate-800 text-xs font-semibold rounded-lg text-slate-300 transition flex items-center gap-1">
+                            <i class="fa-solid fa-key text-amber-400 text-[10px]"></i> Antwort einblenden
+                        </button>
+                        <div id="open-ans-${index}" class="hidden mt-3 p-3 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-slate-300 leading-relaxed border-l-2 border-amber-500">
+                            <strong class="text-emerald-400 block mb-1 text-[11px]">Lösung: ${item.a[item.ans]}</strong>
+                            ${item.exp}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        // Global Keyboard Event Listener mapping
+        document.addEventListener('keydown', (e) => {
+            if (activeTab !== 'flashcards') return;
+            if (e.key === 'ArrowRight') handleFcSwipe('right');
+            if (e.key === 'ArrowLeft') handleFcSwipe('left');
+            if (e.key === ' ') {
+                const card = document.getElementById('activeFcCard');
+                if (card) card.click();
+                e.preventDefault();
+            }
+        });
+
+        // App Boot initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initFlashcards();
+        });
+    </script>
 </body>
 </html>
